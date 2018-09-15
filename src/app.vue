@@ -14,6 +14,6 @@ export default {
 
 <style scoped>
   #text{
-    color: aqua
+    color: aqua;
   }
 </style>
