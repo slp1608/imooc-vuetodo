@@ -4,26 +4,39 @@
       type="text"
       class="add-input"
       autofocus
-      placeholder="接下来要做什么"
+      placeholder="接下来做什么"
       @keyup.enter="addTodo"
     >
-    <Item :todo="todo"></Item>
-    <Tabs :filter="filter"></Tabs>
+    <Item 
+      v-for="todo in filteredTodos" 
+      :key="todo.id" 
+      :todo="todo"
+      @delItem=deleteTodo
+    ></Item>
+
+    <Tabs :filter="filter" :todos="todos" @toggleTabs=toggleTabs @clearAllCompleted=clearAllCompleted></Tabs>
   </section>
 </template>
 
 <script>
 import Item from './item.vue'
 import Tabs from './tabs.vue'
+
+let id = 0
 export default {
   data(){
     return {
-      todo:{
-        id: 0,
-        content: 'this is a todo',
-        completed: false,
-      },
+      todos: [],
       filter: 'all'
+    }
+  },
+  computed: {
+    filteredTodos(){
+      if(this.filter === 'all'){
+        return this.todos
+      }
+      const completed = this.filter === 'completed'
+      return this.todos.filter( item => item.completed == completed)
     }
   },
   components: {
@@ -31,8 +44,22 @@ export default {
     Tabs,
   },
   methods: {
-    addTodo(){
-
+    addTodo(e){
+      this.todos.unshift({
+        id: id++,
+        content: e.target.value.trim(),
+        completed: false,
+      })
+      e.target.value = ''
+    },
+    deleteTodo(id){
+      this.todos.splice(this.todos.findIndex(item => item.id == id), 1)
+    },
+    toggleTabs(state){
+      this.filter = state
+    },
+    clearAllCompleted(){
+      this.todos = this.todos.filter(item => !item.completed)
     }
   }
 }
